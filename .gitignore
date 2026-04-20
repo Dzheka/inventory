@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+
+# Env
+.env
+*.env
+
+# Flutter/Dart
+mobile/.dart_tool/
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/pubspec.lock
+*.g.dart
+*.freezed.dart
+
+# Node / Admin panel
+admin/node_modules/
+admin/dist/
+admin/.env
+
+# Docker
+docker/
+*.log
+
+# macOS
+.DS_Store
