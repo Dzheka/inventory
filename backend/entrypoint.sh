@@ -20,8 +20,10 @@ do
   sleep 2
 done
 
-echo "Running Alembic migrations..."
-alembic upgrade head
+if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
+  echo "Running Alembic migrations..."
+  alembic upgrade head
+fi
 
 echo "Starting server..."
 exec "$@"
