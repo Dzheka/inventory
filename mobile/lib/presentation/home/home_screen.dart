@@ -43,6 +43,12 @@ class HomeScreen extends ConsumerWidget {
               label: const Text('Список активов'),
               onPressed: () => context.go('/home/assets'),
             ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.qr_code_scanner),
+              label: const Text('Сканер'),
+              onPressed: () => context.go('/home/scanner'),
+            ),
           ],
         ),
       ),

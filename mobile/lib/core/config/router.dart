@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../presentation/auth/screens/login_screen.dart';
 import '../../presentation/auth/screens/pin_screen.dart';
 import '../../presentation/assets/screens/asset_list_screen.dart';
+import '../../presentation/assets/screens/scanner_screen.dart';
 import '../../presentation/home/home_screen.dart';
 import '../../presentation/providers/auth_provider.dart';
 
@@ -45,6 +46,10 @@ GoRouter router(Ref ref) {
           GoRoute(
             path: 'assets',
             builder: (_, __) => const AssetListScreen(),
+          ),
+          GoRoute(
+            path: 'scanner',
+            builder: (_, __) => const ScannerScreen(),
           ),
         ],
       ),
