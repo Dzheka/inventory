@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/asset_models.dart';
@@ -21,3 +23,43 @@ final assetListProvider =
     AsyncNotifierProvider<AssetListNotifier, List<AssetModel>>(
   AssetListNotifier.new,
 );
+
+enum ImportStatus { idle, loading, success, error }
+
+class ImportState {
+  final ImportStatus status;
+  final ImportResultModel? result;
+  final String? error;
+
+  const ImportState({
+    this.status = ImportStatus.idle,
+    this.result,
+    this.error,
+  });
+}
+
+class FileImportNotifier extends StateNotifier<ImportState> {
+  final AssetRepository _repository;
+
+  FileImportNotifier(this._repository) : super(const ImportState());
+
+  Future<void> importFile(Uint8List bytes, String filename) async {
+    state = const ImportState(status: ImportStatus.loading);
+    try {
+      final result = await _repository.importFromFile(bytes, filename);
+      state = ImportState(status: ImportStatus.success, result: result);
+    } catch (e) {
+      state = ImportState(
+        status: ImportStatus.error,
+        error: e.toString().replaceFirst('Exception: ', ''),
+      );
+    }
+  }
+
+  void reset() => state = const ImportState();
+}
+
+final fileImportProvider =
+    StateNotifierProvider<FileImportNotifier, ImportState>((ref) {
+  return FileImportNotifier(ref.watch(assetRepositoryProvider));
+});

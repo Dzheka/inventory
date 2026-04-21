@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../datasources/asset_remote_datasource.dart';
@@ -21,6 +24,18 @@ class AssetRepository {
       return await _datasource.getAssetByBarcode(barcode);
     } catch (_) {
       return null;
+    }
+  }
+
+  Future<ImportResultModel> importFromFile(
+      Uint8List bytes, String filename) async {
+    try {
+      return await _datasource.importFromFile(bytes, filename);
+    } on DioException catch (e) {
+      final msg = e.response?.data?['detail'] as String? ??
+          e.message ??
+          'Ошибка загрузки файла';
+      throw Exception(msg);
     }
   }
 }

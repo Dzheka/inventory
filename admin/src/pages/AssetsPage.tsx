@@ -2,12 +2,14 @@ import { useState } from 'react'
 import {
   Table, Button, Input, Tag, Space, Modal, Form,
   Select, Popconfirm, message, Typography, Row, Col,
+  Upload, Alert, Descriptions,
 } from 'antd'
 import {
   PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined,
+  UploadOutlined, DownloadOutlined, InboxOutlined,
 } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { assetsApi, type Asset, type AssetCreate, type AssetUpdate } from '../api/assets'
+import { assetsApi, type Asset, type AssetCreate, type AssetUpdate, type ImportResult } from '../api/assets'
 
 const STATUS_COLORS: Record<string, string> = {
   active: 'green',
@@ -48,6 +50,9 @@ export default function AssetsPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Asset | null>(null)
   const [form] = Form.useForm()
+  const [importOpen, setImportOpen] = useState(false)
+  const [importResult, setImportResult] = useState<ImportResult | null>(null)
+  const [importing, setImporting] = useState(false)
 
   const { data: assets = [], isLoading } = useQuery({
     queryKey: ['assets', search, statusFilter],
@@ -106,6 +111,35 @@ export default function AssetsPage() {
       status: asset.status,
     })
     setModalOpen(true)
+  }
+
+  const handleImport = async (file: File) => {
+    setImporting(true)
+    setImportResult(null)
+    try {
+      const res = await assetsApi.importFromFile(file)
+      setImportResult(res.data)
+      qc.invalidateQueries({ queryKey: ['assets'] })
+    } catch {
+      message.error('Ошибка при импорте файла')
+    } finally {
+      setImporting(false)
+    }
+    return false
+  }
+
+  const handleDownloadTemplate = async () => {
+    try {
+      const res = await assetsApi.downloadTemplate()
+      const url = URL.createObjectURL(res.data as Blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'import_template.xlsx'
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      message.error('Ошибка загрузки шаблона')
+    }
   }
 
   const onSubmit = async (values: AssetCreate & AssetUpdate) => {
@@ -188,9 +222,14 @@ export default function AssetsPage() {
           </Typography.Title>
         </Col>
         <Col>
-          <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
-            Добавить
-          </Button>
+          <Space>
+            <Button icon={<UploadOutlined />} onClick={() => { setImportOpen(true); setImportResult(null) }}>
+              Импорт
+            </Button>
+            <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+              Добавить
+            </Button>
+          </Space>
         </Col>
       </Row>
 
@@ -228,6 +267,74 @@ export default function AssetsPage() {
         pagination={{ pageSize: 50, showSizeChanger: false }}
         scroll={{ x: 800 }}
       />
+
+      <Modal
+        title="Импорт активов из файла"
+        open={importOpen}
+        onCancel={() => setImportOpen(false)}
+        footer={
+          <Button onClick={() => setImportOpen(false)}>
+            Закрыть
+          </Button>
+        }
+        width={560}
+      >
+        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+          <Button
+            icon={<DownloadOutlined />}
+            onClick={handleDownloadTemplate}
+            size="small"
+          >
+            Скачать шаблон (.xlsx)
+          </Button>
+          <Upload.Dragger
+            accept=".xlsx,.xls,.csv"
+            showUploadList={false}
+            beforeUpload={handleImport}
+            disabled={importing}
+            style={{ padding: '8px 0' }}
+          >
+            <p style={{ fontSize: 32, margin: 0 }}>
+              <InboxOutlined />
+            </p>
+            <p>Перетащите файл сюда или нажмите для выбора</p>
+            <p style={{ color: '#999', fontSize: 12 }}>
+              Поддерживаются форматы: .xlsx, .xls, .csv
+            </p>
+          </Upload.Dragger>
+          {importing && <Alert message="Импортируем данные..." type="info" showIcon />}
+          {importResult && (
+            <>
+              <Descriptions bordered size="small" column={1}>
+                <Descriptions.Item label="Создано">
+                  <Typography.Text type="success">{importResult.created}</Typography.Text>
+                </Descriptions.Item>
+                <Descriptions.Item label="Пропущено (уже существуют)">
+                  {importResult.skipped}
+                </Descriptions.Item>
+                <Descriptions.Item label="Ошибок">
+                  <Typography.Text type={importResult.errors.length ? 'danger' : undefined}>
+                    {importResult.errors.length}
+                  </Typography.Text>
+                </Descriptions.Item>
+              </Descriptions>
+              {importResult.errors.length > 0 && (
+                <Alert
+                  type="error"
+                  message="Ошибки при импорте"
+                  description={
+                    <ul style={{ margin: 0, paddingLeft: 16 }}>
+                      {importResult.errors.map((e, i) => (
+                        <li key={i}>Строка {e.row}: {e.message}</li>
+                      ))}
+                    </ul>
+                  }
+                />
+              )}
+            </>
+          )}
+        </Space>
+      </Modal>
 
       <Modal
         title={editing ? 'Редактировать актив' : 'Новый актив'}

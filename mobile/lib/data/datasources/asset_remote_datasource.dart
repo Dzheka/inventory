@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -39,5 +41,14 @@ class AssetRemoteDatasource {
   Future<AssetModel> getAsset(String id) async {
     final response = await _dio.get('/assets/$id');
     return AssetModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  Future<ImportResultModel> importFromFile(
+      Uint8List bytes, String filename) async {
+    final formData = FormData.fromMap({
+      'file': MultipartFile.fromBytes(bytes, filename: filename),
+    });
+    final response = await _dio.post('/assets/import', data: formData);
+    return ImportResultModel.fromJson(response.data as Map<String, dynamic>);
   }
 }

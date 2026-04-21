@@ -44,6 +44,17 @@ export interface AssetUpdate {
   room_id?: number
 }
 
+export interface ImportError {
+  row: number
+  message: string
+}
+
+export interface ImportResult {
+  created: number
+  skipped: number
+  errors: ImportError[]
+}
+
 export const assetsApi = {
   list: (params?: { page?: number; limit?: number; search?: string; status?: string }) =>
     api.get<Asset[]>('/assets', { params }),
@@ -55,4 +66,15 @@ export const assetsApi = {
   update: (id: string, data: AssetUpdate) => api.patch<Asset>(`/assets/${id}`, data),
 
   delete: (id: string) => api.delete(`/assets/${id}`),
+
+  importFromFile: (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return api.post<ImportResult>('/assets/import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
+
+  downloadTemplate: () =>
+    api.get('/assets/import/template', { responseType: 'blob' }),
 }

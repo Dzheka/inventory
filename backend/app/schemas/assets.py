@@ -62,3 +62,14 @@ class AssetUpdateSchema(BaseModel):
     department_id: Optional[int] = None
     room_id: Optional[int] = None
     status: Optional[str] = None
+
+
+class ImportErrorSchema(BaseModel):
+    row: int
+    message: str
+
+
+class ImportResultSchema(BaseModel):
+    created: int
+    skipped: int
+    errors: list[ImportErrorSchema]

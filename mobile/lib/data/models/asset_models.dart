@@ -1,3 +1,36 @@
+class ImportError {
+  final int row;
+  final String message;
+
+  const ImportError({required this.row, required this.message});
+
+  factory ImportError.fromJson(Map<String, dynamic> json) => ImportError(
+        row: json['row'] as int,
+        message: json['message'] as String,
+      );
+}
+
+class ImportResultModel {
+  final int created;
+  final int skipped;
+  final List<ImportError> errors;
+
+  const ImportResultModel({
+    required this.created,
+    required this.skipped,
+    required this.errors,
+  });
+
+  factory ImportResultModel.fromJson(Map<String, dynamic> json) =>
+      ImportResultModel(
+        created: json['created'] as int,
+        skipped: json['skipped'] as int,
+        errors: (json['errors'] as List<dynamic>)
+            .map((e) => ImportError.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+}
+
 class AssetModel {
   final String id;
   final String inventoryNumber;
