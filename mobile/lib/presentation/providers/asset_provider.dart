@@ -63,3 +63,38 @@ final fileImportProvider =
     StateNotifierProvider<FileImportNotifier, ImportState>((ref) {
   return FileImportNotifier(ref.watch(assetRepositoryProvider));
 });
+
+enum CreateStatus { idle, loading, success, error }
+
+class CreateAssetState {
+  final CreateStatus status;
+  final String? error;
+
+  const CreateAssetState({this.status = CreateStatus.idle, this.error});
+}
+
+class CreateAssetNotifier extends StateNotifier<CreateAssetState> {
+  final AssetRepository _repository;
+
+  CreateAssetNotifier(this._repository) : super(const CreateAssetState());
+
+  Future<void> create(CreateAssetRequest request) async {
+    state = const CreateAssetState(status: CreateStatus.loading);
+    try {
+      await _repository.createAsset(request);
+      state = const CreateAssetState(status: CreateStatus.success);
+    } catch (e) {
+      state = CreateAssetState(
+        status: CreateStatus.error,
+        error: e.toString().replaceFirst('Exception: ', ''),
+      );
+    }
+  }
+
+  void reset() => state = const CreateAssetState();
+}
+
+final createAssetProvider =
+    StateNotifierProvider<CreateAssetNotifier, CreateAssetState>((ref) {
+  return CreateAssetNotifier(ref.watch(assetRepositoryProvider));
+});

@@ -5,6 +5,7 @@ import 'core/config/router.dart';
 import 'presentation/providers/auth_provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: InventoryApp()));
 }
 

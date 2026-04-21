@@ -31,6 +31,28 @@ class ImportResultModel {
       );
 }
 
+class CreateAssetRequest {
+  final String inventoryNumber;
+  final String name;
+  final String? barcode;
+  final String? description;
+
+  const CreateAssetRequest({
+    required this.inventoryNumber,
+    required this.name,
+    this.barcode,
+    this.description,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'inventory_number': inventoryNumber,
+        'name': name,
+        if (barcode != null && barcode!.isNotEmpty) 'barcode': barcode,
+        if (description != null && description!.isNotEmpty)
+          'description': description,
+      };
+}
+
 class AssetModel {
   final String id;
   final String inventoryNumber;

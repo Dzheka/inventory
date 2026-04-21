@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../data/models/asset_models.dart';
 import '../../providers/asset_provider.dart';
@@ -69,6 +70,10 @@ class _AssetListScreenState extends ConsumerState<AssetListScreen> {
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push('/home/assets/create'),
+        child: const Icon(Icons.add),
       ),
       body: asyncAssets.when(
         loading: () => const Center(child: CircularProgressIndicator()),

@@ -43,6 +43,11 @@ class AssetRemoteDatasource {
     return AssetModel.fromJson(response.data as Map<String, dynamic>);
   }
 
+  Future<AssetModel> createAsset(CreateAssetRequest request) async {
+    final response = await _dio.post('/assets', data: request.toJson());
+    return AssetModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
   Future<ImportResultModel> importFromFile(
       Uint8List bytes, String filename) async {
     final formData = FormData.fromMap({

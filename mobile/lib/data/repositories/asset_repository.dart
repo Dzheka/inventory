@@ -27,6 +27,17 @@ class AssetRepository {
     }
   }
 
+  Future<AssetModel> createAsset(CreateAssetRequest request) async {
+    try {
+      return await _datasource.createAsset(request);
+    } on DioException catch (e) {
+      final msg = e.response?.data?['detail'] as String? ??
+          e.message ??
+          'Ошибка создания актива';
+      throw Exception(msg);
+    }
+  }
+
   Future<ImportResultModel> importFromFile(
       Uint8List bytes, String filename) async {
     try {

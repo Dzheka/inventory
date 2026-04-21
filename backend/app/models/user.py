@@ -12,10 +12,7 @@ from app.database import Base
 
 class RoleEnum(str, enum.Enum):
     ADMIN = "admin"
-    SUPERVISOR = "supervisor"
-    INVENTORIZATOR = "inventorizator"
-    ACCOUNTANT = "accountant"
-    OBSERVER = "observer"
+    USER = "user"
 
 
 class Role(Base):

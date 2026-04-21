@@ -48,5 +48,3 @@ def require_roles(*roles: str):
 
 # Convenience deps
 require_admin = require_roles("admin")
-require_supervisor_or_admin = require_roles("admin", "supervisor")
-require_inventorizator = require_roles("admin", "supervisor", "inventorizator")
