@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../providers/auth_provider.dart';
 
@@ -37,9 +38,11 @@ class HomeScreen extends ConsumerWidget {
                   style: const TextStyle(color: Colors.grey)),
             ],
             const SizedBox(height: 48),
-            // Phase 2: scanning, asset list, sync
-            const Text('Phase 2 — scanning coming soon',
-                style: TextStyle(color: Colors.grey)),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.inventory_2_outlined),
+              label: const Text('Список активов'),
+              onPressed: () => context.go('/home/assets'),
+            ),
           ],
         ),
       ),
